@@ -1,14 +1,6 @@
 const mysql = require('mysql')
 const config = require('../config')
 
-
-const prueba = {
-    id: 1,
-    nombre: 'juan',
-    edad: 43
-}
-
-
 const dbconfig = {
     host: config.mysql.host,
     user: config.mysql.user,
@@ -43,8 +35,7 @@ function connMysql() {
 connMysql();
 
 function todos(tabla) {
-    //return 'Todos';
-    return prueba;
+    return 'Todos';
 }
 
 function uno(tabla, id) {
@@ -63,5 +54,5 @@ module.exports = {
     todos,
     uno,
     anadir,
-    eliminar
+    eliminar,
 }
