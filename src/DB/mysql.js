@@ -1,24 +1,33 @@
 const mysql = require('mysql')
 const config = require('../config')
-
+/*
 const dbconfig = {
     host: config.mysql.host,
     user: config.mysql.user,
     password: config.mysql.password,
     database: config.mysql.database,
 }
+*/
 
-/*
+const dbconfig = {
+    host: config.mysql.host,
+    user: config.mysql.user,
+    password: config.mysql.password,
+    database: config.mysql.database
+}
+
 let conexion;
 
 function connMysql() {
     conexion = mysql.createConnection(dbconfig);
 
+    console.log('holas')
+
     conexion.connect((err) => {
         if(err) {
             console.log('[db err]', err);
             setTimeout(connMysql, 200);
-        } else {
+        }else {
             console.log('DB Conectada!!')
         }
     });
@@ -32,11 +41,16 @@ function connMysql() {
         }
     })
 }
+
 connMysql();
-*/
 
 function todos(tabla) {
-    return 'Todo Ok desde ranking';
+    return new Promise( (resolve, reject) => {
+        conexion.query(`SELECT * FROM ${tabla}`, (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+        })
+    });
 }
 
 function uno(tabla, id) {
