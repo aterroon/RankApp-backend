@@ -1,9 +1,9 @@
-const expreess = require('express');
+const express = require('express');
 
 const respuesta = require('../../red/respuestas');
 const controlador = require('./controlador');
 
-const router = expreess.Router();
+const router = express.Router();
 
 router.get('/', function (req, res) {
     const todos = controlador.todos();

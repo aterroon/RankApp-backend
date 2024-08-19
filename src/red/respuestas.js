@@ -13,7 +13,7 @@ exports.error = function(req, res, msg, status) {
     const statusCode = status || 500;
     const msgError = msg || 'Error interno';
     res.status(status).send({
-        error: false,
+        error: true,
         status: statusCode,
         body: msgError
     });

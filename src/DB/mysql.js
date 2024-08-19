@@ -8,6 +8,7 @@ const dbconfig = {
     database: config.mysql.database,
 }
 
+/*
 let conexion;
 
 function connMysql() {
@@ -31,11 +32,11 @@ function connMysql() {
         }
     })
 }
-
 connMysql();
+*/
 
 function todos(tabla) {
-    return 'Todos';
+    return 'Todo Ok desde ranking';
 }
 
 function uno(tabla, id) {
