@@ -1,12 +1,13 @@
 const expreess = require('express');
 
 const respuesta = require('../../red/respuestas');
+const controlador = require('./controlador');
 
 const router = expreess.Router();
 
 router.get('/', function (req, res) {
-    //res.send('Ranking OK')
-    respuesta.success(req, res, 'Santi mamapinga llegas tarde', 200)
+    const todos = controlador.todos();
+    respuesta.success(req, res, todos, 200)
 });
 
 module.exports = router;
