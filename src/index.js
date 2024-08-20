@@ -1,16 +1,17 @@
-const mysql = require('./DB/mysql');
 const express = require('express');
 require('dotenv').config();
-
-const ranking = require('./modulos/ranking/rutas')
 
 const app = express();
 
 const port = process.env.PORT;
+const users = require('./routes/usersRoutes')
+
+
 
 app.listen(port, () => {
     console.log("Servidor escuchando en el puerto", port);
 });
 
-//rutas 
-app.use('/api/ranking', ranking)
+//path
+app.use(express.json());
+app.use('/api/users', users)

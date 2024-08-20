@@ -8,12 +8,6 @@ const dbconfig = {
     database: process.env.DB
 }
 
-const prueba = {
-    id : 1,
-    nombre: 'santi',
-    puntos : 100
-}
-
 
 let conexion; 
 
@@ -40,37 +34,21 @@ function connMysql() {
     })
 }
 
-//connMysql();
+connMysql();
 
 
-function todos(tabla) {
-    return prueba;
-    /*
+
+function fullTable(tabla) {
     return new Promise( (resolve, reject) => {
         conexion.query(`SELECT * FROM ${tabla}`, (error, result) => {
             if (error) return reject(error);
             resolve(result);
         })
     });
-    */
-}
-
-function uno(tabla, id) {
-
-}
-
-function anadir(tabla, data) {
-
-}
-
-function eliminar(tabla, id) {
-
 }
 
 module.exports = {
-    todos,
-    uno,
-    anadir,
-    eliminar,
-    connMysql
+    fullTable,
+    connMysql,
+    conexion
 }
