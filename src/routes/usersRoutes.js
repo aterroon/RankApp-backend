@@ -1,5 +1,6 @@
 const express = require('express')
 const { getAllUsers, getUser, addUser } = require('../models/users');
+const { getRankings } = require('../models/rankingScore');
 const router = express.Router();
 
 
@@ -22,6 +23,21 @@ router.get('/:nickname', async (req, res) => {
         }
 
         res.json(user[0]);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+router.get('/:nickname/rankings', async (req, res) => {
+    try {
+        const nickname = req.params.nickname;
+        const rankings = await getRankings(nickname);
+
+        if (rankings.length === 0) { 
+            return res.status(404).json({'message':'rankings not found'});
+        }
+
+        res.json(rankings);
     } catch (error) {
         res.status(500).send(error.message);
     }

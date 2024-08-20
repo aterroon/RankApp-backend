@@ -1,5 +1,5 @@
 const { conexion, fullTable } = require('../DB/mysql.js');
-
+const {formatDateForSQL} = require('../utils/utils.js')
 const table = 'RANKING'
 
 function getAllRanking() {
@@ -15,11 +15,15 @@ function getRanking(id){
     });
 }
 
-function addRanking(name, description, fechaIni, fechaFin, reward, nickname) {
+function addRanking(name, fechaIni, fechaFin,description, reward, nickname) {
+    console.log(fechaFin)
     return new Promise((resolve, reject) => {
+        const formattedFechaIni = formatDateForSQL(fechaIni);
+        const formattedFechaFin = formatDateForSQL(fechaFin);
+        
         const query = 'INSERT INTO RANKING (name, fechaIni, fechaFin, description, reward) VALUES (?,?,?,?,?)';
         
-        conexion.query(query, [name, fechaIni, fechaFin, description, reward], (error, results) => {
+        conexion.query(query, [name, formattedFechaIni, formattedFechaFin, description, reward], (error, results) => {
             if (error) {
                 if (error.code === 'ER_DUP_ENTRY') {
                     return reject({
