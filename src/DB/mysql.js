@@ -38,9 +38,9 @@ connMysql();
 
 
 
-function fullTable(tabla) {
+function fullTable(table) {
     return new Promise( (resolve, reject) => {
-        conexion.query(`SELECT * FROM ${tabla}`, (error, result) => {
+        conexion.query(`SELECT * FROM ${table}`, (error, result) => {
             if (error) return reject(error);
             resolve(result);
         })

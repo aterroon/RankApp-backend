@@ -1,5 +1,5 @@
 const express = require('express')
-const { getAllUsers, addUser } = require('../models/users');
+const { getAllUsers, getUser, addUser } = require('../models/users');
 const router = express.Router();
 
 
@@ -11,6 +11,22 @@ router.get('/', async (req, res) => {
         res.status(500).send(error.message);
     }
 });
+
+router.get('/:nickname', async (req, res) => {
+    try {
+        const nickname = req.params.nickname;
+        const user = await getUser(nickname);
+
+        if (user.length === 0) { 
+            return res.status(404).json({'message':'User not found'});
+        }
+
+        res.json(user[0]);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
 
 router.post('/', async (req, res) => {
     try {

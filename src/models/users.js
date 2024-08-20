@@ -6,6 +6,15 @@ function getAllUsers() {
     return fullTable(table);
 }
 
+function getUser(nickname){
+    return new Promise( (resolve, reject) => {
+        conexion.query('SELECT * FROM ?? WHERE nickname = ?', [table, nickname], (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+        })
+    });
+}
+
 function addUser(nickname) {
     return new Promise((resolve, reject) => {
         const query = 'INSERT INTO USUARIO (nickname) VALUES (?)';
@@ -33,5 +42,6 @@ function addUser(nickname) {
 
 module.exports = {
     getAllUsers,
+    getUser,
     addUser
 }
