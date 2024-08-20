@@ -1,27 +1,25 @@
 const mysql = require('mysql')
-const config = require('../config')
-/*
-const dbconfig = {
-    host: config.mysql.host,
-    user: config.mysql.user,
-    password: config.mysql.password,
-    database: config.mysql.database,
-}
-*/
+require('dotenv').config();
 
 const dbconfig = {
-    host: config.mysql.host,
-    user: config.mysql.user,
-    password: config.mysql.password,
-    database: config.mysql.database
+    host: process.env.HOST,
+    user: process.env.USER,
+    password: process.env.PASSWORD,
+    database: process.env.DB
 }
 
-let conexion;
+const prueba = {
+    id : 1,
+    nombre: 'santi',
+    puntos : 100
+}
+
+
+let conexion; 
 
 function connMysql() {
-    conexion = mysql.createConnection(dbconfig);
 
-    console.log('holas')
+    conexion = mysql.createConnection(dbconfig);
 
     conexion.connect((err) => {
         if(err) {
@@ -42,15 +40,19 @@ function connMysql() {
     })
 }
 
-connMysql();
+//connMysql();
+
 
 function todos(tabla) {
+    return prueba;
+    /*
     return new Promise( (resolve, reject) => {
         conexion.query(`SELECT * FROM ${tabla}`, (error, result) => {
             if (error) return reject(error);
             resolve(result);
         })
     });
+    */
 }
 
 function uno(tabla, id) {
@@ -70,4 +72,5 @@ module.exports = {
     uno,
     anadir,
     eliminar,
+    connMysql
 }

@@ -1,6 +1,6 @@
 const db = require('../../DB/mysql');
 
-const TABLA = 'ranking';
+const TABLA = 'USUARIO';
 
 function todos() {
     return db.todos(TABLA);

@@ -1,5 +1,16 @@
-const app = require('./app');
+const mysql = require('./DB/mysql');
+const express = require('express');
+require('dotenv').config();
 
-app.listen(app.get('port'), () => {
-    console.log("Servidor escuchando en el puerto", app.get("port"));
+const ranking = require('./modulos/ranking/rutas')
+
+const app = express();
+
+const port = process.env.PORT;
+
+app.listen(port, () => {
+    console.log("Servidor escuchando en el puerto", port);
 });
+
+//rutas 
+app.use('/api/ranking', ranking)
