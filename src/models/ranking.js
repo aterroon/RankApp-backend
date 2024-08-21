@@ -16,7 +16,6 @@ function getRanking(id){
 }
 
 function addRanking(name, fechaIni, fechaFin,description, reward, nickname) {
-    console.log(fechaFin)
     return new Promise((resolve, reject) => {
         const formattedFechaIni = formatDateForSQL(fechaIni);
         const formattedFechaFin = formatDateForSQL(fechaFin);
@@ -33,6 +32,7 @@ function addRanking(name, fechaIni, fechaFin,description, reward, nickname) {
                 }
             }
             resolve({
+                id: results.insertId,
                 name: name, 
                 description: description, 
                 fechaIni: fechaIni, 

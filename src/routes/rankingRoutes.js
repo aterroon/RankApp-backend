@@ -1,6 +1,7 @@
 const express = require('express')
 const { getAllRanking, getRanking, addRanking } = require('../models/ranking');
 const { getUsers, addUserRanking } = require('../models/rankingScore');
+const { formatDateForSQL } = require('../utils/utils');
 const router = express.Router();
 
 
@@ -26,7 +27,8 @@ router.get('/:id', async (req, res) => {
         const rankingData = ranking[0];
     
         rankingData.users = users;
-
+        rankingData.fechaIni = formatDateForSQL(rankingData.fechaIni)
+        rankingData.fechaFin = formatDateForSQL(rankingData.fechaFin)
         res.json(rankingData);
 
     } catch (error) {
@@ -37,8 +39,10 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
+        console.log(req.body)
         const { name, fechaIni, fechaFin, description, reward, nickname } = req.body;
         const newRanking = await addRanking( name, fechaIni, fechaFin, description, reward, nickname);
+        await addUserRanking( nickname, newRanking.id);
         res.status(201).json(newRanking);
     } catch (error) {
         res.status(error.status || 500).json({ message: error.message }); 

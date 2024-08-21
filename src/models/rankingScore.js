@@ -6,14 +6,22 @@ function getAllUsersScores() {
     return fullTable(table);
 }
 
-function getRankings(nickname){
-    return new Promise( (resolve, reject) => {
-        conexion.query('SELECT ranking_id, score FROM ?? WHERE usuario_nickname = ?', [table, nickname], (error, result) => {
+function getRankings(nickname) {
+    return new Promise((resolve, reject) => {
+        const query = `
+            SELECT ur.ranking_id, ur.score, r.name 
+            FROM RANKING_SCORE ur
+            JOIN RANKING r ON ur.ranking_id = r.id
+            WHERE ur.usuario_nickname = ?
+        `;
+        
+        conexion.query(query, [nickname], (error, result) => {
             if (error) return reject(error);
             resolve(result);
-        })
+        });
     });
 }
+
 
 function getUsers(id){
     return new Promise( (resolve, reject) => {
