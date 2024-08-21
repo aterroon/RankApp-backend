@@ -5,7 +5,8 @@ const app = express();
 
 const port = process.env.PORT;
 const users = require('./routes/usersRoutes')
-const rankings = require('./routes/rankingRoutes')
+const rankings = require('./routes/rankingRoutes');
+const activity= require('./routes/activityRoutes');
 
 
 
@@ -17,3 +18,4 @@ app.listen(port, () => {
 app.use(express.json());
 app.use('/api/users', users)
 app.use('/api/rankings', rankings)
+app.use('/api/activity', activity)

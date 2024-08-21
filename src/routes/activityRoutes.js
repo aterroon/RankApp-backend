@@ -1,5 +1,5 @@
 const express = require('express')
-const { getAllActivities, getActivity, addActivity } = require('../models/activity');
+const { getAllActivities, getActivitiesRanking, addActivity } = require('../models/activity');
 const router = express.Router();
 
 
@@ -12,16 +12,12 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/rankings/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        const activity = await getActivity(id);
+        const activity = await getActivitiesRanking(id);
 
-        if (activity.length === 0) { 
-            return res.status(404).json({'message':'Activity not found'});
-        }
-
-        res.json(activity[0]);
+        res.json(activity);
     } catch (error) {
         res.status(500).send(error.message);
     }
@@ -29,11 +25,11 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        const { id, name, description, score } = req.body;
-        const newActivity = await addActivity(id, name, description, score);
+        const {name, description, score, id_rank } = req.body;
+        const newActivity = await addActivity(name, description, score, id_rank);
         res.status(201).json(newActivity);
     } catch (error) {
-        res.status(error.status || 500).json({ message: error.message }); // Responder con el código 400 y mensaje adecuado
+        res.status(error.status || 500).json({ message: error.message });
     }
 });
 

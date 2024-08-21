@@ -6,6 +6,15 @@ function getAllUsersScores() {
     return fullTable(table);
 }
 
+function getUserScore(nickname, id_ranking){
+    return new Promise( (resolve, reject) => {
+        conexion.query('SELECT score FROM ?? WHERE ranking_id = ? AND usuario_nickname = ?', [table, id_ranking, nickname], (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+        })
+    });
+}
+
 function getRankings(nickname) {
     return new Promise((resolve, reject) => {
         const query = `
@@ -55,9 +64,29 @@ function addUserRanking(nickname, id) {
     });
 }
 
+function updateUserRanking(nickname, id, score) {
+    return new Promise((resolve, reject) => {
+        const query = 'UPDATE RANKING_SCORE SET score = score + ?  WHERE usuario_nickname = ? AND ranking_id = ?';
+        
+        conexion.query(query, [score,nickname,id], (error, results) => {
+            if (error) {
+                if (error)  {
+                    return reject({
+                        status: 404,
+                        message: 'nickname or ranking id not found'
+                    });
+                }
+            }
+            resolve(getUserScore(nickname, id));
+        });
+    });
+}
+
 module.exports = {
     getAllUsersScores,
+    getUserScore,
     getUsers,
     getRankings,
-    addUserRanking
+    addUserRanking,
+    updateUserRanking
 }
