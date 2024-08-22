@@ -1,5 +1,5 @@
 const e = require('express');
-const { conexion, fullTable } = require('../DB/mysql.js');
+const { connMysql, closeConnection, fullTable } = require('../DB/mysql.js');
 
 const table = 'ACTIVITY_DONE'
 
@@ -10,11 +10,14 @@ function getAllActivitiesDone() {
 async function getActivityDone(autor, rankID, score) {
     try {
         const query1 = 'SELECT id_activity, fecha, juez FROM ACTIVITY_DONE WHERE autor = ? AND id_ranking = ?';
+        let conexion = connMysql();
         const activitiesDone = await new Promise((resolve, reject) => {
             conexion.query(query1, [autor, rankID], (error, results) => {
                 if (error) return reject(error);
                 resolve(results);
             });
+        }).finally(() => {
+            closeConnection(conexion);
         });
 
         if (activitiesDone.length === 0) {
@@ -24,11 +27,14 @@ async function getActivityDone(autor, rankID, score) {
     
         const activitiesDetails = await Promise.all(activitiesDone.map(async activity => {
             const query2 = 'SELECT id, name, description, score FROM ACTIVITY WHERE id = ?';
+            let conexion = connMysql();
             const [activityDetail] = await new Promise((resolve, reject) => {
                 conexion.query(query2, [activity.id_activity], (error, results) => {
                     if (error) return reject(error);
                     resolve(results);
                 });
+            }).finally(() => {
+                closeConnection(conexion);
             });
 
             return {
@@ -55,8 +61,12 @@ async function getActivityDone(autor, rankID, score) {
 
 
 async function addActivityDone(autor, idRanking, idActivity, juez, fecha) {
+    let conexion; // Declaramos la variable fuera del bloque try para poder cerrarla en finally
     try {
-        const query1 = 'SELECT *  FROM ACTIVITY_DONE WHERE id_ranking = ? AND id_activity = ? AND autor = ?';
+        conexion = connMysql(); // Conexión única
+
+        // Verificar si la actividad ya ha sido realizada
+        const query1 = 'SELECT * FROM ACTIVITY_DONE WHERE id_ranking = ? AND id_activity = ? AND autor = ?';
         const rows = await new Promise((resolve, reject) => {
             conexion.query(query1, [idRanking, idActivity, autor], (error, results) => {
                 if (error) {
@@ -68,32 +78,50 @@ async function addActivityDone(autor, idRanking, idActivity, juez, fecha) {
                 resolve(results);
             });
         });
+
+        // Si la actividad no existe, la insertamos
         if (rows.length === 0) {
             const insertQuery = 'INSERT INTO ACTIVITY_DONE (id_ranking, id_activity, fecha, count, autor, juez) VALUES (?, ?, ?, ?, ?, ?)';
-        await conexion.query(insertQuery, [idRanking, idActivity, fecha, 1, autor, juez]);
+            await new Promise((resolve, reject) => {
+                conexion.query(insertQuery, [idRanking, idActivity, fecha, 1, autor, juez], (error, results) => {
+                    if (error) return reject(error);
+                    resolve(results);
+                });
+            });
 
-        return { autor };
-        }
-        else{
+            return { autor };
+        } else {
+            // Si la actividad ya existe, actualizamos el conteo
             const updateQuery = 'UPDATE ACTIVITY_DONE SET count = count + 1 WHERE id_ranking = ? AND id_activity = ? AND autor = ?';
-                await conexion.query(updateQuery, [idRanking, idActivity, autor]);
-                return { autor };
-        }
-        
+            await new Promise((resolve, reject) => {
+                conexion.query(updateQuery, [idRanking, idActivity, autor], (error, results) => {
+                    if (error) return reject(error);
+                    resolve(results);
+                });
+            });
 
+            return { autor };
+        }
     } catch (error) {
-        console.log(error)
+        console.error(error);
+        throw error; // Re-lanzar el error para que pueda ser manejado por el llamador de la función
+    } finally {
+        if (conexion) closeConnection(conexion); // Cerramos la conexión en el finally
     }
 }
+
 
 async function deleteActivityDone(autor, idRanking, idActivity) {
     try {
         const querySelect = 'SELECT count FROM ACTIVITY_DONE WHERE autor = ? AND id_ranking = ? AND id_activity = ?';
+        let conexion = connMysql()
         const [activity] = await new Promise((resolve, reject) => {
             conexion.query(querySelect, [autor, idRanking, idActivity], (error, results) => {
                 if (error) return reject(error);
                 resolve(results);
             });
+        }).finally(() => {
+            closeConnection(conexion);
         });
 
         if (!activity) {
@@ -105,11 +133,14 @@ async function deleteActivityDone(autor, idRanking, idActivity) {
 
         if (activity.count === 1) {
             const queryDelete = 'DELETE FROM ACTIVITY_DONE WHERE autor = ? AND id_ranking = ? AND id_activity = ?';
+            let conexion = connMysql();
             const result = await new Promise((resolve, reject) => {
                 conexion.query(queryDelete, [autor, idRanking, idActivity], (error, results) => {
                     if (error) return reject(error);
                     resolve(results);
                 });
+            }).finally(() => {
+                closeConnection(conexion);
             });
             return {
                 status: 200,
@@ -118,11 +149,14 @@ async function deleteActivityDone(autor, idRanking, idActivity) {
 
         } else {
             const queryUpdate = 'UPDATE ACTIVITY_DONE SET count = count - 1 WHERE autor = ? AND id_ranking = ? AND id_activity = ?';
+            let conexion = connMysql();
             const result = await new Promise((resolve, reject) => {
                 conexion.query(queryUpdate, [autor, idRanking, idActivity], (error, results) => {
                     if (error) return reject(error);
                     resolve(results);
                 });
+            }).finally(() => {
+                closeConnection(conexion);
             });
             return {
                 status: 200,

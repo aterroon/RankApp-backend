@@ -1,12 +1,14 @@
-const { conexion, fullTable } = require('../DB/mysql.js');
+const { connMysql, closeConnection, fullTable } = require('../DB/mysql.js');
 
 const table = 'ACTIVITY'
+
 
 function getAllActivities() {
     return fullTable(table);
 }
 
 function getActivity(id){
+    let conexion = connMysql();    
     return new Promise( (resolve, reject) => {
         conexion.query(
             'SELECT * FROM ACTIVITY A WHERE A.id = ?',
@@ -16,10 +18,13 @@ function getActivity(id){
                 resolve(result);
             }
         );
+    }).finally(() => {
+        closeConnection(conexion);
     });
 }
 
 function getActivitiesRanking(id){
+    let conexion = connMysql();    
     return new Promise( (resolve, reject) => {
         conexion.query(
             'SELECT A.id, A.name, A.description, A.score FROM ACTIVITY A JOIN ACTIVITY_OPTION AO ON A.id = AO.id_activity WHERE AO.id_ranking = ?',
@@ -29,14 +34,17 @@ function getActivitiesRanking(id){
                 resolve(result);
             }
         );
+    }).finally(() => {
+        closeConnection(conexion);
     });
 }
 
 async function addActivity(name, description, score, id_rank) {
     try {
         const query1 = 'SELECT *  FROM RANKING WHERE id = ?';
+        let conexion1 = connMysql();        
         const rows = await new Promise((resolve, reject) => {
-            conexion.query(query1, [id_rank], (error, results) => {
+            conexion1.query(query1, [id_rank], (error, results) => {
                 if (error) {
                     return reject({
                         status: 500,
@@ -45,6 +53,8 @@ async function addActivity(name, description, score, id_rank) {
                 }
                 resolve(results);
             });
+        }).finally(() => {
+            closeConnection(conexion1);
         });
         if (rows.length === 0) {
             return {
@@ -54,8 +64,9 @@ async function addActivity(name, description, score, id_rank) {
         }
 
         const query2 = 'INSERT INTO ACTIVITY (name, description, score) VALUES (?, ?, ?)';
+        let conexion2 = connMysql();        
         const activityResult = await new Promise((resolve, reject) => {
-            conexion.query(query2, [name, description, score], (error, results) => {
+            conexion2.query(query2, [name, description, score], (error, results) => {
                 if (error) {
                     return reject({
                         status: 500,
@@ -64,13 +75,16 @@ async function addActivity(name, description, score, id_rank) {
                 }
                 resolve(results);
             });
+        }).finally(() => {
+            closeConnection(conexion2);
         });
 
         const activityId = activityResult.insertId;
 
         const query3 = 'INSERT INTO ACTIVITY_OPTION (id_activity, id_ranking) VALUES (?, ?)';
+        let conexion3 = connMysql();        
         await new Promise((resolve, reject) => {
-            conexion.query(query3, [activityId, id_rank], (error, results) => {
+            conexion3.query(query3, [activityId, id_rank], (error, results) => {
                 if (error) {
                     return reject({
                         status: 500,
@@ -79,6 +93,8 @@ async function addActivity(name, description, score, id_rank) {
                 }
                 resolve(results);
             });
+        }).finally(() => {
+            closeConnection(conexion3);
         });
 
         return {

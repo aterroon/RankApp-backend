@@ -9,11 +9,9 @@ const dbconfig = {
 }
 
 
-let conexion; 
-
 function connMysql() {
 
-    conexion = mysql.createConnection(dbconfig);
+    let conexion = mysql.createConnection(dbconfig);
 
     conexion.connect((err) => {
         if(err) {
@@ -24,31 +22,40 @@ function connMysql() {
         }
     });
 
-    conexion.on('error', err => {
-        console.log('[db err]', err);
-        if (err.code === 'PROTOCOL_CONNECTION_LOST'){
-            connMysql();
-        } else {
-            throw err;
-        }
-    })
+    return conexion
 }
 
-connMysql();
+function closeConnection(conexion) {
+    if (conexion) {
+        conexion.end((err) => {
+            if (err) {
+                console.log('[db err] Error cerrando la conexión:', err);
+            } else {
+                console.log('Conexión cerrada correctamente.');
+            }
+        });
+    } else {
+        console.log('No hay ninguna conexión activa.');
+    }
+}
 
 
 
 function fullTable(table) {
-    return new Promise( (resolve, reject) => {
+    let conexion = connMysql();
+    return new Promise((resolve, reject) => {
+        
         conexion.query(`SELECT * FROM ${table}`, (error, result) => {
             if (error) return reject(error);
             resolve(result);
-        })
+        });
+    }).finally(() => {
+        closeConnection(conexion);
     });
 }
 
 module.exports = {
     fullTable,
     connMysql,
-    conexion
+    closeConnection
 }
